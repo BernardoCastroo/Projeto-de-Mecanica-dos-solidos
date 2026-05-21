@@ -39,3 +39,36 @@ function atualizarListaNos() {
         ul.appendChild(li);
     });
 }
+
+function calcularPropriedadesSecao() {
+    const base = parseFloat(document.getElementById('viga-base').value);
+    const altura = parseFloat(document.getElementById('viga-altura').value);
+
+    if (!base || !altura) {
+        alert("Por favor, preencha a base e a altura da seção retangular.");
+        return;
+    }
+
+    // Fórmulas de Hibbeler para seção retangular:
+    // Centróide (c) = h / 2
+    // Momento de Inércia (I) = (b * h^3) / 12
+    const c = altura / 2;
+    const I = (base * Math.pow(altura, 3)) / 12;
+
+    // Converte I de mm^4 para cm^4 para melhor leitura em engenharia
+    const I_cm4 = I / 10000;
+
+    const resultadoDiv = document.getElementById('resultado-perfil');
+    resultadoDiv.innerHTML = `
+        <div style="margin-top: 1rem; padding: 1rem; background-color: #f4f4f4; border-left: 4px solid #a19d85;">
+            <strong>Propriedades Calculadas (Seção Retangular):</strong><br>
+            • Posição da Linha Neutra (c): <strong>${c.toFixed(2)} mm</strong><br>
+            • Momento de Inércia (I<sub>z</sub>): <strong>${I_cm4.toFixed(2)} cm<sup>4</sup></strong> (${I.toExponential(2)} mm<sup>4</sup>)
+        </div>
+    `;
+
+    // Libera visualmente o próximo passo alterando a opacidade
+    document.getElementById('viga-passo2').style.opacity = "1";
+    document.getElementById('viga-passo3').style.opacity = "1";
+    document.getElementById('viga-passo4').style.opacity = "1";
+}
