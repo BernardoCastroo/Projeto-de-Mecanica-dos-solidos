@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Vigas - Resistência dos Materiais (Hibbeler)</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es3/tex-mml-chtml.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
     <header>
         <h1>Análise de Vigas (Flexão)</h1>
-        <p>Fundamentado em: HIBBELER, R.C. Resistência dos Materiais, 10ª Ed.</p>
+        <p>Feito com basse no livro HIBBELER, R.C. Resistência dos Materiais</p>
     </header>
 
     <main>
@@ -62,16 +61,17 @@
                     </div>
                 </section>
 
-                <section class="step-section">
-                    <h2>4. Dimensionamento (Formulações)</h2>
-                    <p>Tensão Normal Máxima obtida pela Linha Neutra no Centróide:</p>
-                    <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem; background:#f9f9f9; padding:1rem; border-radius:4px;">
-                        $$\sigma_{max} = \frac{M_{max} \cdot c}{I}$$
-                    </div>
-                    <button class="btn-calcular" onclick="executarCalculoCompleto()">Calcular Esforços Estruturais</button>
-                    <div id="result-calculo-final"></div>
-                </section>
-            </div>
+            <section class="step-section">
+                <h2>4. Dimensionamento (Formulações)</h2>
+                <p>Teorema Fundamental do Cálculo:</p>
+
+                <div id="formula-hibbeler" style="text-align: center; margin: 1.5rem 0; font-size: 1.4rem; background:#f9f9f9; padding:1rem; border-radius:4px; color: #111;">
+                    $$ \int_{a}^{b} f(x) \,dx = F(b) - F(a) $$
+                </div>
+    
+                <button class="btn-calcular" onclick="executarCalculoCompleto()">Calcular Esforços Estruturais</button>
+                <div id="result-calculo-final"></div>
+            </section>
 
             <div class="graph-panel">
                 <h3>Modelo Estático da Viga</h3>
@@ -82,7 +82,7 @@
                     <strong>Lista de Cargas Aplicadas:</strong>
                     <ul id="ul-cargas-viga"></ul>
                 </div>
-                <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%; border: 1px solid #ccc;" onclick="limparViga()">Limpar Cargas</button>
+                <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%; border: 1px solid #ccc; padding: 0.4rem; cursor: pointer;" onclick="limparViga()">Limpar Cargas</button>
             </div>
         </div>
     </main>
