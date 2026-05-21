@@ -1,13 +1,17 @@
 // Banco de dados da estrutura
-let nos = {}; // { 'A': {x: 0, y:0}, 'B': {x:3, y:0} }
-let barras = []; // [ ['A', 'B'], ['B', 'C'] ]
+let nos = {}; 
+let barras = []; 
+let apoios = {}; // <--- NOVO: Guarda os apoios (ex: { 'A': 'pino' })
 
 // Configurações do Canvas
 const canvas = document.getElementById('canvasTrelica');
 const ctx = canvas.getContext('2d');
-const padding = 40; // Espaço nas bordas
+const padding = 40; 
 
-// --- Funções de Interface ---
+// Escala Fixa para caber de 0 a 10
+const escala = (canvas.width - 2 * padding) / 10; 
+
+// --- Funções de Interface e Validação ---
 
 function adicionarNo() {
     const idInput = document.getElementById('node-id');
@@ -23,26 +27,90 @@ function adicionarNo() {
         return;
     }
 
+    if (x < 0 || x > 10 || y < 0 || y > 10) {
+        alert("As coordenadas devem estar entre 0.0 e 10.0 metros.");
+        return;
+    }
+
+    // 1. Verifica se o NOME (ID) já existe
     if (nos[id]) {
         alert("Um nó com esse ID já existe.");
         return;
     }
 
-    // Salva no banco
+    // 2. NOVO: Verifica se as COORDENADAS já estão ocupadas por outro nó
+    const coordExiste = Object.values(nos).some(n => n.x === x && n.y === y);
+    if (coordExiste) {
+        alert(`Já existe um nó nessas exatas coordenadas (${x}, ${y}). Escolha outra posição.`);
+        return;
+    }
+
+    // Salva no objeto
     nos[id] = { x: x, y: y };
 
-    // Atualiza lista HTML
-    const ul = document.getElementById('ul-nos');
-    const li = document.createElement('li');
-    li.textContent = `Nó ${id}: (${x.toFixed(1)}, ${y.toFixed(1)}) m`;
-    ul.appendChild(li);
+    // Atualiza a lista da tela e redesenha
+    atualizarListaNos();
+    desenharEstrutura();
 
-    // Limpa inputs e foca
     idInput.value = '';
     xInput.value = '';
     yInput.value = '';
     idInput.focus();
+}
 
+function atualizarListaNos() {
+    const ul = document.getElementById('ul-nos');
+    ul.innerHTML = ''; // Limpa a lista para reconstruir
+
+    Object.keys(nos).forEach(id => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.marginBottom = '8px';
+
+        const span = document.createElement('span');
+        span.textContent = `Nó ${id}: (${nos[id].x.toFixed(1)}, ${nos[id].y.toFixed(1)}) m`;
+
+        // Botão X Vermelho para deletar o Nó
+        const btnRemover = document.createElement('button');
+        btnRemover.textContent = 'x';
+        btnRemover.style.padding = '2px 8px';
+        btnRemover.style.backgroundColor = 'transparent';
+        btnRemover.style.color = '#dc3545';
+        btnRemover.style.border = 'none';
+        btnRemover.style.cursor = 'pointer';
+        btnRemover.style.fontWeight = 'bold';
+        btnRemover.style.fontSize = '14px';
+        
+        btnRemover.onclick = () => removerNo(id);
+
+        li.appendChild(span);
+        li.appendChild(btnRemover);
+        ul.appendChild(li);
+    });
+}
+
+function removerNo(idParaRemover) {
+    delete nos[idParaRemover];
+    barras = barras.filter(barra => barra[0] !== idParaRemover && barra[1] !== idParaRemover);
+    
+    // NOVO: Remove o apoio se o nó for apagado
+    delete apoios[idParaRemover]; 
+
+    atualizarListaNos();
+    atualizarListaBarras();
+    atualizarListaApoios(); // Atualiza a tela
+    desenharEstrutura();
+}
+
+function limparTudo() {
+    nos = {};
+    barras = [];
+    apoios = {}; // Limpa os apoios
+    atualizarListaNos();
+    atualizarListaBarras();
+    atualizarListaApoios();
     desenharEstrutura();
 }
 
@@ -58,7 +126,6 @@ function adicionarBarra() {
         return;
     }
 
-    // Verifica se barra já existe (em qualquer ordem)
     const existe = barras.some(b => (b[0] === n1 && b[1] === n2) || (b[0] === n2 && b[1] === n1));
     if (existe) {
         alert("Esta barra já foi adicionada.");
@@ -67,133 +134,244 @@ function adicionarBarra() {
 
     barras.push([n1, n2]);
 
-    // Calcula comprimento (Pitágoras)
-    const dx = nos[n2].x - nos[n1].x;
-    const dy = nos[n2].y - nos[n1].y;
-    const comp = Math.sqrt(dx*dx + dy*dy);
-
-    // Atualiza lista HTML
-    const ul = document.getElementById('ul-barras');
-    const li = document.createElement('li');
-    li.textContent = `Barra ${n1}-${n2}: L = ${comp.toFixed(2)} m`;
-    ul.appendChild(li);
+    atualizarListaBarras();
+    desenharEstrutura();
 
     startInput.value = '';
     endInput.value = '';
     startInput.focus();
+}
 
+function atualizarListaBarras() {
+    const ul = document.getElementById('ul-barras');
+    ul.innerHTML = '';
+
+    barras.forEach((barra, index) => {
+        const n1 = barra[0];
+        const n2 = barra[1];
+
+        // Cálculo do comprimento da barra (Pitágoras)
+        const dx = nos[n2].x - nos[n1].x;
+        const dy = nos[n2].y - nos[n1].y;
+        const comp = Math.sqrt(dx*dx + dy*dy);
+
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.marginBottom = '8px';
+
+        const span = document.createElement('span');
+        span.textContent = `Barra ${n1}-${n2}: L = ${comp.toFixed(2)} m`;
+
+        // Botão X Vermelho para deletar a Barra
+        const btnRemover = document.createElement('button');
+        btnRemover.textContent = 'x';
+        btnRemover.style.padding = '2px 8px';
+        btnRemover.style.backgroundColor = 'transparent';
+        btnRemover.style.color = '#dc3545';
+        btnRemover.style.border = 'none';
+        btnRemover.style.cursor = 'pointer';
+        btnRemover.style.fontWeight = 'bold';
+        btnRemover.style.fontSize = '14px';
+        
+        btnRemover.onclick = () => removerBarra(index);
+
+        li.appendChild(span);
+        li.appendChild(btnRemover);
+        ul.appendChild(li);
+    });
+}
+
+function removerBarra(indexParaRemover) {
+    // Remove a barra do array usando o índice dela
+    barras.splice(indexParaRemover, 1);
+    
+    atualizarListaBarras();
     desenharEstrutura();
 }
 
-function limparTudo() {
-    nos = {};
-    barras = [];
-    document.getElementById('ul-nos').innerHTML = '';
-    document.getElementById('ul-barras').innerHTML = '';
+// --- Lógica dos Apoios ---
+function adicionarApoio() {
+    const nodeInput = document.getElementById('apoio-node');
+    const tipoInput = document.getElementById('apoio-tipo');
+
+    const id = nodeInput.value.toUpperCase().trim();
+    const tipo = tipoInput.value;
+
+    if (!id) {
+        alert("Informe a letra do nó para inserir o apoio.");
+        return;
+    }
+    if (!nos[id]) {
+        alert(`O nó "${id}" não existe! Crie o nó primeiro no Passo 1.`);
+        return;
+    }
+    if (apoios[id]) {
+        alert(`Já existe um apoio no nó "${id}". Remova-o antes de trocar.`);
+        return;
+    }
+
+    apoios[id] = tipo;
+    atualizarListaApoios();
+    desenharEstrutura();
+
+    nodeInput.value = '';
+    nodeInput.focus();
+}
+
+function atualizarListaApoios() {
+    const ul = document.getElementById('ul-apoios');
+    ul.innerHTML = '';
+
+    Object.keys(apoios).forEach(id => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.marginBottom = '8px';
+
+        const span = document.createElement('span');
+        const nomeApoio = apoios[id] === 'pino' ? 'Pino (Fixo)' : 'Rolete (Móvel)';
+        span.textContent = `Nó ${id}: ${nomeApoio}`;
+
+        const btnRemover = document.createElement('button');
+        btnRemover.textContent = 'x';
+        btnRemover.style.padding = '2px 8px';
+        btnRemover.style.backgroundColor = 'transparent';
+        btnRemover.style.color = '#dc3545';
+        btnRemover.style.border = 'none';
+        btnRemover.style.cursor = 'pointer';
+        btnRemover.style.fontWeight = 'bold';
+        btnRemover.style.fontSize = '14px';
+        
+        btnRemover.onclick = () => removerApoio(id);
+
+        li.appendChild(span);
+        li.appendChild(btnRemover);
+        ul.appendChild(li);
+    });
+}
+
+function removerApoio(id) {
+    delete apoios[id];
+    atualizarListaApoios();
     desenharEstrutura();
 }
 
 // --- Motor Gráfico 2D ---
 
+const toPx = (xReal, yReal) => {
+    return {
+        x: padding + (xReal * escala),
+        y: canvas.height - padding - (yReal * escala)
+    };
+};
+
 function desenharEstrutura() {
-    // Limpa o canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    const idsNos = Object.keys(nos);
-    if (idsNos.length === 0) return;
+    // Desenha Eixos e Números
+    ctx.strokeStyle = '#bbb';
+    ctx.fillStyle = '#555';
+    ctx.font = '11px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.lineWidth = 1;
 
-    // 1. Encontrar limites para fator de escala
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    idsNos.forEach(id => {
-        const no = nos[id];
-        if (no.x < minX) minX = no.x;
-        if (no.x > maxX) maxX = no.x;
-        if (no.y < minY) minY = no.y;
-        if (no.y > maxY) maxY = no.y;
-    });
+    const pOrigem = toPx(0, 0);
+    ctx.beginPath(); ctx.moveTo(pOrigem.x, pOrigem.y); ctx.lineTo(toPx(10, 0).x, pOrigem.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pOrigem.x, pOrigem.y); ctx.lineTo(pOrigem.x, toPx(0, 10).y); ctx.stroke();
 
-    // Evita divisão por zero se houver só um nó ou nós na mesma linha
-    let rangeX = maxX - minX;
-    let rangeY = maxY - minY;
-    if (rangeX === 0) rangeX = 1;
-    if (rangeY === 0) rangeY = 1;
+    for (let i = 0; i <= 10; i++) {
+        const pX = toPx(i, 0);
+        const pY = toPx(0, i);
 
-    // Fatores de escala para ajustar ao canvas mantendo proporção (proporção não mantida estrita para preencher melhor)
-    const scaleX = (canvas.width - 2 * padding) / rangeX;
-    const scaleY = (canvas.height - 2 * padding) / rangeY;
-    
-    // Usar a menor escala para manter proporção real (opcional)
-    // const scale = Math.min(scaleX, scaleY);
+        ctx.strokeStyle = '#eee';
+        ctx.beginPath(); ctx.moveTo(pX.x, pOrigem.y); ctx.lineTo(pX.x, toPx(i, 10).y); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pOrigem.x, pY.y); ctx.lineTo(toPx(10, i).x, pY.y); ctx.stroke();
 
-    // Função auxiliar para converter coordenada real em pixel do canvas
-    // Nota: O Y do canvas é invertido (0 é no topo)
-    const toPx = (xReal, yReal) => {
-        return {
-            x: padding + (xReal - minX) * scaleX,
-            y: canvas.height - (padding + (yReal - minY) * scaleY)
-        };
-    };
+        ctx.strokeStyle = '#999';
+        ctx.beginPath(); ctx.moveTo(pX.x, pOrigem.y - 4); ctx.lineTo(pX.x, pOrigem.y + 4); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pOrigem.x - 4, pY.y); ctx.lineTo(pOrigem.x + 4, pY.y); ctx.stroke();
 
-    // 2. Desenhar Grelha de Referência (Opcional, profissional)
-    ctx.strokeStyle = '#eee';
-    ctx.lineWidth = 0.5;
-    for(let i=0; i<=5; i++) {
-        // Linhas verticais
-        let xGrelha = minX + (rangeX / 5) * i;
-        let p1 = toPx(xGrelha, minY);
-        let p2 = toPx(xGrelha, maxY);
-        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-        
-        // Linhas horizontais
-        let yGrelha = minY + (rangeY / 5) * i;
-        let p3 = toPx(minX, yGrelha);
-        let p4 = toPx(maxX, yGrelha);
-        ctx.beginPath(); ctx.moveTo(p3.x, p3.y); ctx.lineTo(p4.x, p4.y); ctx.stroke();
+        if (i === 0) {
+            ctx.fillText('0', pOrigem.x - 12, pOrigem.y + 12);
+        } else {
+            ctx.fillText(i, pX.x, pOrigem.y + 15); 
+            ctx.fillText(i, pOrigem.x - 15, pY.y); 
+        }
     }
 
-    // 3. Desenhar Barras
-    ctx.strokeStyle = '#333'; // Cor das barras
+    // Desenha as Barras
+    ctx.strokeStyle = '#333';
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
 
     barras.forEach(barra => {
-        const p1Real = nos[barra[0]];
-        const p2Real = nos[barra[1]];
-        const p1Px = toPx(p1Real.x, p1Real.y);
-        const p2Px = toPx(p2Real.x, p2Real.y);
+        if (nos[barra[0]] && nos[barra[1]]) {
+            const p1Px = toPx(nos[barra[0]].x, nos[barra[0]].y);
+            const p2Px = toPx(nos[barra[1]].x, nos[barra[1]].y);
 
-        ctx.beginPath();
-        ctx.moveTo(p1Px.x, p1Px.y);
-        ctx.lineTo(p2Px.x, p2Px.y);
-        ctx.stroke();
-
-        // Desenhar texto do comprimento no meio da barra (Informação solicitada)
-        ctx.fillStyle = '#666';
-        ctx.font = '10px Arial';
-        ctx.textAlign = 'center';
-        const dx = p2Real.x - p1Real.x;
-        const dy = p2Real.y - p1Real.y;
-        const comp = Math.sqrt(dx*dx + dy*dy);
-        const midX = (p1Px.x + p2Px.x) / 2;
-        const midY = (p1Px.y + p2Px.y) / 2;
-        // ctx.fillText(`${comp.toFixed(1)}m`, midX, midY - 5); // Desativado para não poluir
+            ctx.beginPath();
+            ctx.moveTo(p1Px.x, p1Px.y);
+            ctx.lineTo(p2Px.x, p2Px.y);
+            ctx.stroke();
+        }
     });
 
-    // 4. Desenhar Nós
-    idsNos.forEach(id => {
+    // ... (código dos eixos e barras)
+
+    // DESENHAR APOIOS (VÍNCULOS)
+    Object.keys(apoios).forEach(id => {
+        const noReal = nos[id];
+        if (!noReal) return;
+        const px = toPx(noReal.x, noReal.y);
+
+        ctx.strokeStyle = '#333';
+        ctx.fillStyle = '#fff';
+        ctx.lineWidth = 2;
+
+        if (apoios[id] === 'pino') {
+            // Desenha um triângulo para o Pino
+            ctx.beginPath();
+            ctx.moveTo(px.x, px.y + 6); 
+            ctx.lineTo(px.x - 12, px.y + 25);
+            ctx.lineTo(px.x + 12, px.y + 25);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            // Linha de terra
+            ctx.beginPath(); ctx.moveTo(px.x - 18, px.y + 25); ctx.lineTo(px.x + 18, px.y + 25); ctx.stroke();
+        } else if (apoios[id] === 'rolete') {
+            // Desenha um triângulo com rodinhas para o Rolete
+            ctx.beginPath();
+            ctx.moveTo(px.x, px.y + 6);
+            ctx.lineTo(px.x - 10, px.y + 20);
+            ctx.lineTo(px.x + 10, px.y + 20);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            // Rodinhas
+            ctx.beginPath(); ctx.arc(px.x - 5, px.y + 24, 4, 0, 2*Math.PI); ctx.stroke();
+            ctx.beginPath(); ctx.arc(px.x + 5, px.y + 24, 4, 0, 2*Math.PI); ctx.stroke();
+            // Linha de terra
+            ctx.beginPath(); ctx.moveTo(px.x - 18, px.y + 28); ctx.lineTo(px.x + 18, px.y + 28); ctx.stroke();
+        }
+    });
+
+    // 3. DESENHAR NÓS
+    // ... (restante do código)
+    Object.keys(nos).forEach(id => {
         const noReal = nos[id];
         const noPx = toPx(noReal.x, noReal.y);
 
-        // Círculo do nó
         ctx.beginPath();
         ctx.arc(noPx.x, noPx.y, 6, 0, 2 * Math.PI);
-        ctx.fillStyle = '#d4af37'; // Ouro/Safariaccent
+        ctx.fillStyle = '#d4af37'; 
         ctx.fill();
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Texto do ID e Coordenadas (Informação solicitada)
         ctx.fillStyle = '#000';
         ctx.font = 'bold 12px Segoe UI';
         ctx.textAlign = 'left';
@@ -201,9 +379,8 @@ function desenharEstrutura() {
         
         ctx.fillStyle = '#555';
         ctx.font = '10px Arial';
-        ctx.fillText(`(${noReal.x.toFixed(1)}, ${noReal.y.toFixed(1)})`, noPx.x + 10, noPx.y + 2);
+        ctx.fillText(`(${noReal.x.toFixed(1)}, ${noReal.y.toFixed(1)})`, noPx.x + 10, noPx.y + 4);
     });
 }
 
-// Inicializa canvas vazio
 desenharEstrutura();

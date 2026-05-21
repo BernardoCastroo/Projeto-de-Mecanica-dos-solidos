@@ -64,10 +64,30 @@
                     </div>
                 </section>
 
-                <section class="step-section" id="passo3">
-                    <h2>3. Adicionar Apoios e Cargas</h2>
-                    <p>Em breve: Lógica de cálculo.</p>
-                </section>
+  <section class="step-section" id="passo3">
+    <h2>3. Adicionar Apoios (Vínculos)</h2>
+    <p>Especifique os vínculos nos nós.</p>
+    
+    <div class="input-group">
+        <div class="input-field">
+            <label>Nó</label>
+            <input type="text" id="apoio-node" placeholder="A" maxlength="2">
+        </div>
+        <div class="input-field">
+            <label>Tipo de Apoio</label>
+            <select id="apoio-tipo" style="width: 130px;">
+                <option value="pino">Pino (Fixo)</option>
+                <option value="rolete">Rolete (Móvel)</option>
+            </select>
+        </div>
+        <button class="btn-add" onclick="adicionarApoio()">+ Apoio</button>
+    </div>
+
+    <div class="data-list" id="lista-apoios">
+        <strong>Apoios Adicionados:</strong>
+        <ul id="ul-apoios"></ul>
+    </div>
+</section>
 
                 <button class="btn-calcular" onclick="alert('Lógica de cálculo matricial necessária.')">Calcular Esforços</button>
             </div>
@@ -75,7 +95,7 @@
             <div class="graph-panel">
                 <h3>Visualização 2D</h3>
                 <p style="font-size:0.8rem; color:#666;">Cotas em metros.</p>
-                <canvas id="canvasTrelica" width="500" height="400"></canvas>
+                <canvas id="canvasTrelica" width="500" height="500"></canvas>
                 <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%;" onclick="limparTudo()">Limpar Tudo</button>
             </div>
         </div>
