@@ -5,72 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Análise de Vigas - Resistência dos Materiais (Hibbeler)</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es3/tex-mml-chtml.js"></script>
 </head>
 <body>
 
     <header>
-        <h1>Análise de Vigas (Flexão Pura e Simples)</h1>
+        <h1>Análise de Vigas (Flexão)</h1>
         <p>Fundamentado em: HIBBELER, R.C. Resistência dos Materiais, 10ª Ed.</p>
     </header>
 
     <main>
-        <div style="margin-bottom: 1.5rem;">
-            <a href="index.html" class="btn-voltar">← Voltar para a Página Inicial</a>
+        <a href="index.html" class="btn-voltar">← Voltar para a Página Inicial</a>
+
+        <div class="calc-container">
+            <div class="inputs-panel">
+                <section class="step-section">
+                    <h2>1. Geometria da Viga</h2>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Comprimento L (m)</label>
+                            <input type="number" id="viga-L" step="0.5" value="4.0" oninput="desenharViga()">
+                        </div>
+                    </div>
+                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#666;">Apoios padrão: Pino em x = 0 e Rolete em x = L (Biapoiada).</p>
+                </section>
+
+                <section class="step-section">
+                    <h2>2. Seção Transversal (Retangular)</h2>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Base b (mm)</label>
+                            <input type="number" id="sect-b" placeholder="100" value="100">
+                        </div>
+                        <div class="input-field">
+                            <label>Altura h (mm)</label>
+                            <input type="number" id="sect-h" placeholder="200" value="200">
+                        </div>
+                        <button class="btn-add" onclick="calcularGeometria()">Definir Perfil</button>
+                    </div>
+                    <div id="result-geometria"></div>
+                </section>
+
+                <section class="step-section">
+                    <h2>3. Carga Concentrada</h2>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Força P (kN)</label>
+                            <input type="number" id="load-P" placeholder="10" value="10">
+                        </div>
+                        <div class="input-field">
+                            <label>Posição x (m)</label>
+                            <input type="number" id="load-a" placeholder="2" value="2">
+                        </div>
+                        <button class="btn-add" onclick="adicionarCargaP()">+ Adicionar Carga</button>
+                    </div>
+                </section>
+
+                <section class="step-section">
+                    <h2>4. Dimensionamento (Formulações)</h2>
+                    <p>Tensão Normal Máxima obtida pela Linha Neutra no Centróide:</p>
+                    <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem; background:#f9f9f9; padding:1rem; border-radius:4px;">
+                        $$\sigma_{max} = \frac{M_{max} \cdot c}{I}$$
+                    </div>
+                    <button class="btn-calcular" onclick="executarCalculoCompleto()">Calcular Esforços Estruturais</button>
+                    <div id="result-calculo-final"></div>
+                </section>
+            </div>
+
+            <div class="graph-panel">
+                <h3>Modelo Estático da Viga</h3>
+                <p style="font-size:0.8rem; color:#666; margin-bottom: 0.5rem;">Diagrama de cargas ativas e dimensões.</p>
+                <canvas id="canvasViga" width="500" height="250"></canvas>
+                
+                <div class="data-list" style="margin-top:1rem;">
+                    <strong>Lista de Cargas Aplicadas:</strong>
+                    <ul id="ul-cargas-viga"></ul>
+                </div>
+                <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%; border: 1px solid #ccc;" onclick="limparViga()">Limpar Cargas</button>
+            </div>
         </div>
-
-        <section class="step-section" id="viga-passo1">
-            <h2>1. Geometria da Viga e Seção Transversal</h2>
-            <p>Insira o comprimento total da viga e os dados para o cálculo do Momento de Inércia ($I$) e da linha neutra ($c$).</p>
-            
-            <div class="input-group">
-                <label>Comprimento (m): <input type="number" id="viga-comprimento" step="0.1" placeholder="Ex: 4.0"></label>
-                <label>Base da Seção (mm): <input type="number" id="viga-base" step="1" placeholder="Ex: 100"></label>
-                <label>Altura da Seção (mm): <input type="number" id="viga-altura" step="1" placeholder="Ex: 200"></label>
-                <button onclick="calcularPropriedadesSecao()">Definir Perfil</button>
-            </div>
-            <div class="node-list" id="resultado-perfil"></div>
-        </section>
-
-        <section class="step-section" id="viga-passo2" style="opacity: 0.5;">
-            <h2>2. Condições de Apoio</h2>
-            <p>Defina o tipo de vinculação da viga (Biapoiada, Engastada/Em Balanço).</p>
-            <div class="input-group">
-                <label>Configuração:
-                    <select id="viga-apoio" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-                        <option value="biapoiada">Biapoiada (Apoio Simples + Articulação)</option>
-                        <option value="balanco">Engastada (Em Balanço)</option>
-                    </select>
-                </label>
-            </div>
-        </section>
-
-        <section class="step-section" id="viga-passo3" style="opacity: 0.5;">
-            <h2>3. Cargas Aplicadas (Forças e Momentos)</h2>
-            <p>Adicione cargas concentradas ou distribuídas retangularmente ao longo do vão.</p>
-            <div class="input-group">
-                <label>Tipo de Carga:
-                    <select id="viga-tipo-carga" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
-                        <option value="concentrada">Concentrada (kN)</option>
-                        <option value="distribuida">Distribuída (kN/m)</option>
-                    </select>
-                </label>
-                <label>Magnitude: <input type="number" id="viga-carga-val" step="0.1" placeholder="Ex: 15.0"></label>
-                <label>Posição X (m): <input type="number" id="viga-carga-pos" step="0.1" placeholder="Ex: 2.0"></label>
-                <button onclick="alert('Carga adicionada para o processamento de diagramas.')">Adicionar Carga</button>
-            </div>
-        </section>
-
-        <section class="step-section" id="viga-passo4" style="opacity: 0.5;">
-            <h2>4. Dimensionamento à Flexão</h2>
-            <p>Cálculo da Tensão Normal Máxima ($\sigma_{max}$) baseada na fórmula da flexão de Hibbeler:</p>
-            <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
-                $$\sigma_{max} = \frac{M \cdot c}{I}$$
-            </div>
-            <p>Onde $M$ é o Momento Fletor Máximo, $c$ é a distância da linha neutra à fibra mais distante, e $I$ é o Momento de Inércia da área.</p>
-        </section>
-
-        <button class="btn-calcular" onclick="alert('Processando Reações, Cortantes, Momentos e Tensões Admissíveis...')">Calcular Viga</button>
     </main>
 
+    <script src="script_vigas.js"></script>
 </body>
 </html>
