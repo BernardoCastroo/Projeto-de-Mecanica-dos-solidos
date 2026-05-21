@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Treliças - Mecânica dos Sólidos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Cálculo de Treliças</h1>
+        <p>Projeto de Mecânica dos Sólidos</p>
+    </header>
+
+    <main>
+        <div style="margin-bottom: 1.5rem;">
+            <a href="index.html" class="btn-voltar">← Voltar para a Página Inicial</a>
+        </div>
+
+        <section class="step-section" id="passo1">
+            <h2>1. Definir Nós da Treliça</h2>
+            <p>Forneça a localização no plano (coordenadas X e Y) de todos os nós da treliça.</p>
+            
+            <div class="input-group">
+                <label>Nomeie o Nó: <input type="text" id="node-id" placeholder="Ex: A" maxlength="2"></label>
+                <label>Coordenada X: <input type="number" id="node-x" step="0.01" placeholder="0.0"></label>
+                <label>Coordenada Y: <input type="number" id="node-y" step="0.01" placeholder="0.0"></label>
+                <button onclick="adicionarNo()">Adicionar Nó</button>
+            </div>
+
+            <div class="node-list" id="lista-nos">
+                <strong>Nós Adicionados:</strong>
+                <ul id="ul-nos"></ul>
+            </div>
+        </section>
+
+        <section class="step-section" id="passo2" style="opacity: 0.5;">
+            <h2>2. Definir Elementos (Barras)</h2>
+            <p>Especifique quais nós pertencem a um mesmo elemento para conectá-los.</p>
+            <div class="input-group">
+                <label>Nó de Início: <input type="text" id="bar-start" placeholder="Ex: A" maxlength="2" style="width: 70px;"></label>
+                <label>Nó de Fim: <input type="text" id="bar-end" placeholder="Ex: B" maxlength="2" style="width: 70px;"></label>
+                <button onclick="alert('Lógica de adicionar barras será implementada aqui!')">Conectar Nós (Barra)</button>
+            </div>
+        </section>
+
+        <section class="step-section" id="passo3" style="opacity: 0.5;">
+            <h2>3. Adicionar Vínculos</h2>
+            <p>Especifique os vínculos que mantêm a treliça equilibrada (pino, rolete, etc.).</p>
+        </section>
+
+        <section class="step-section" id="passo4" style="opacity: 0.5;">
+            <h2>4. Aplicar Forças</h2>
+            <p>Forneça a intensidade e direção das forças e em quais nós estão aplicadas.</p>
+        </section>
+
+        <button class="btn-calcular">Calcular Treliça</button>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
