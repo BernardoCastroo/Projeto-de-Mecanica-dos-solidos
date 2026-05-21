@@ -29,10 +29,22 @@ function calcularGeometria() {
     `;
 }
 
+// Função auxiliar para reconstruir a lista de cargas na interface (HTML)
+function atualizarListaCargasUI() {
+    const ul = document.getElementById('ul-cargas-viga');
+    ul.innerHTML = ''; 
+
+    cargasP.forEach(carga => {
+        const li = document.createElement('li');
+        const seta = carga.P > 0 ? "⬇" : "⬆";
+        li.textContent = `Força ${seta} de ${Math.abs(carga.P).toFixed(2)} kN em x = ${carga.a.toFixed(2)} m`;
+        ul.appendChild(li);
+    });
+}
+
 function adicionarCargaP() {
     let L = parseFloat(document.getElementById('viga-L').value) || 4.0;
     
-    // Trava para o comprimento máximo da viga ser 10
     if (L > 10) {
         alert("O comprimento máximo permitido para a viga é 10m.");
         document.getElementById('viga-L').value = 10;
@@ -52,14 +64,23 @@ function adicionarCargaP() {
         return;
     }
 
-    cargasP.push({ P: P, a: a });
+    // Lógica de soma/subtração exata no mesmo ponto x
+    const cargaExistente = cargasP.find(carga => Math.abs(carga.a - a) < 1e-4);
 
-    const ul = document.getElementById('ul-cargas-viga');
-    const li = document.createElement('li');
-    const seta = P > 0 ? "⬇" : "⬆";
-    li.textContent = `Força ${seta} de ${Math.abs(P)} kN em x = ${a.toFixed(2)} m`;
-    ul.appendChild(li);
+    if (cargaExistente) {
+        cargaExistente.P += P;
 
+        if (Math.abs(cargaExistente.P) < 1e-4) {
+            cargasP = cargasP.filter(carga => carga !== cargaExistente);
+            alert(`As forças em x = ${a.toFixed(2)}m se anularam e foram removidas.`);
+        } else {
+            alert(`Carga updated em x = ${a.toFixed(2)}m. Nova magnitude: ${Math.abs(cargaExistente.P).toFixed(2)} kN`);
+        }
+    } else {
+        cargasP.push({ P: P, a: a });
+    }
+
+    atualizarListaCargasUI();
     desenharViga();
 }
 
@@ -137,20 +158,18 @@ function desenharViga() {
     ctx.fillStyle = '#111'; 
     ctx.fillRect(paddingH, yViga - 6, vigaWidthPx, 12);
 
-    // B. RÉGUA NUMÉRICA GRADUADA (De 0 até L)
+    // B. RÉGUA NUMÉRICA GRADUADA
     ctx.strokeStyle = '#888';
     ctx.fillStyle = '#555';
     ctx.font = '11px Arial';
     ctx.textAlign = 'center';
     ctx.lineWidth = 1;
 
-    // Linha base da régua
     ctx.beginPath();
     ctx.moveTo(paddingH, yViga + 35);
     ctx.lineTo(canvas.width - paddingH, yViga + 35);
     ctx.stroke();
 
-    // Laço para desenhar os metros na régua de 1 em 1 metro
     for (let i = 0; i <= L; i++) {
         const marcaPx = toPxX(i);
         ctx.beginPath();
@@ -165,42 +184,108 @@ function desenharViga() {
     ctx.fillStyle = '#fff'; 
     ctx.lineWidth = 2;
     
-    // Apoio A (Esquerdo)
     const pxA = toPxX(0);
     ctx.beginPath(); ctx.moveTo(pxA, yViga + 6); ctx.lineTo(pxA - 12, yViga + 22); ctx.lineTo(pxA + 12, yViga + 22); ctx.closePath(); ctx.fill(); ctx.stroke();
 
-    // Apoio B (Direito)
     const pxB = toPxX(L);
     ctx.beginPath(); ctx.moveTo(pxB, yViga + 6); ctx.lineTo(pxB - 12, yViga + 20); ctx.lineTo(pxB + 12, yViga + 20); ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.arc(pxB - 5, yViga + 24, 3, 0, 2 * Math.PI); ctx.stroke();
     ctx.beginPath(); ctx.arc(pxB + 5, yViga + 24, 3, 0, 2 * Math.PI); ctx.stroke();
 
-    // D. Cargas Concentradas
+    // D. Cargas Concentradas com Evitação de Sobreposição Estética
+    const baseArrowHeight = 35; 
+    const stepHeight = 20;      
+    const alturasOcupadas = []; 
+
+    // Mapeamento prévio para calcular a geometria de todas as setas antes de desenhar
+    const cargasCalculadas = cargasP.map(carga => {
+        const cxPx = toPxX(carga.a);
+        const setaParaBaixo = carga.P > 0;
+        const direcao = setaParaBaixo ? 'baixo' : 'cima';
+
+        let currentArrowHeight = baseArrowHeight;
+        let conflito = true;
+
+        while (conflito) {
+            conflito = false;
+            for (let outra of alturasOcupadas) {
+                if (outra.direcao === direcao) {
+                    if (Math.abs(outra.cxPx - cxPx) < 45 && outra.height === currentArrowHeight) {
+                        currentArrowHeight += stepHeight;
+                        conflito = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        alturasOcupadas.push({ cxPx: cxPx, direcao: direcao, height: currentArrowHeight });
+
+        const yStart = setaParaBaixo ? yViga - 6 - currentArrowHeight : yViga + 6 + currentArrowHeight;
+        const yEnd = setaParaBaixo ? yViga - 9 : yViga + 9;
+
+        return {
+            carga,
+            cxPx,
+            setaParaBaixo,
+            yStart,
+            yEnd
+        };
+    });
+
+    // CAMADA 1: Desenhar as estruturas físicas de todas as setas primeiro
     ctx.strokeStyle = '#d9534f'; 
     ctx.fillStyle = '#d9534f'; 
     ctx.lineWidth = 2.5;
-    const arrowHeight = 35;
 
-    cargasP.forEach(carga => {
-        const cxPx = toPxX(carga.a);
-        const setaParaBaixo = carga.P > 0;
-        
-        const yStart = setaParaBaixo ? yViga - 6 - arrowHeight : yViga + 6 + arrowHeight;
-        const yEnd = setaParaBaixo ? yViga - 9 : yViga + 9;
-
-        ctx.beginPath(); ctx.moveTo(cxPx, yStart); ctx.lineTo(cxPx, yEnd); ctx.stroke();
+    cargasCalculadas.forEach(item => {
+        ctx.beginPath(); 
+        ctx.moveTo(item.cxPx, item.yStart); 
+        ctx.lineTo(item.cxPx, item.yEnd); 
+        ctx.stroke();
 
         ctx.beginPath();
-        if (setaParaBaixo) {
-            ctx.moveTo(cxPx, yEnd); ctx.lineTo(cxPx - 5, yEnd - 8); ctx.lineTo(cxPx + 5, yEnd - 8);
+        if (item.setaParaBaixo) {
+            ctx.moveTo(item.cxPx, item.yEnd); 
+            ctx.lineTo(item.cxPx - 5, item.yEnd - 8); 
+            ctx.lineTo(item.cxPx + 5, item.yEnd - 8);
         } else {
-            ctx.moveTo(cxPx, yEnd); ctx.lineTo(cxPx - 5, yEnd + 8); ctx.lineTo(cxPx + 5, yEnd + 8);
+            ctx.moveTo(item.cxPx, item.yEnd); 
+            ctx.lineTo(item.cxPx - 5, item.yEnd + 8); 
+            ctx.lineTo(item.cxPx + 5, item.yEnd + 8);
         }
-        ctx.closePath(); ctx.fill();
+        ctx.closePath(); 
+        ctx.fill();
+    });
 
+    // CAMADA 2: Desenhar os balões de texto por cima (garante isolamento total)
+    cargasCalculadas.forEach(item => {
         ctx.font = 'bold 11px Tahoma';
-        const txtOffsetY = setaParaBaixo ? yStart - 6 : yStart + 14;
-        ctx.fillText(`${Math.abs(carga.P)} kN`, cxPx, txtOffsetY);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        const texto = `${Math.abs(item.carga.P).toFixed(2)} kN`;
+        const txtWidth = ctx.measureText(texto).width;
+        const txtOffsetY = item.setaParaBaixo ? item.yStart - 10 : item.yStart + 10;
+
+        // Configuração geométrica do badge (fundo do texto)
+        const padW = 8;
+        const padH = 14;
+        const bx = item.cxPx - (txtWidth + padW) / 2;
+        const by = txtOffsetY - padH / 2;
+
+        // Desenha o fundo branco sólido (recorta as setas que passam por trás)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(bx, by, txtWidth + padW, padH);
+
+        // Desenha a moldura fina do badge
+        ctx.strokeStyle = '#d9534f';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(bx, by, txtWidth + padW, padH);
+
+        // Escreve o texto final no topo absoluto
+        ctx.fillStyle = '#d9534f';
+        ctx.fillText(texto, item.cxPx, txtOffsetY);
     });
 }
 
