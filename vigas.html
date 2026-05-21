@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Vigas - Resistência dos Materiais (Hibbeler)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Análise de Vigas (Flexão Pura e Simples)</h1>
+        <p>Fundamentado em: HIBBELER, R.C. Resistência dos Materiais, 10ª Ed.</p>
+    </header>
+
+    <main>
+        <div style="margin-bottom: 1.5rem;">
+            <a href="index.html" class="btn-voltar">← Voltar para a Página Inicial</a>
+        </div>
+
+        <section class="step-section" id="viga-passo1">
+            <h2>1. Geometria da Viga e Seção Transversal</h2>
+            <p>Insira o comprimento total da viga e os dados para o cálculo do Momento de Inércia ($I$) e da linha neutra ($c$).</p>
+            
+            <div class="input-group">
+                <label>Comprimento (m): <input type="number" id="viga-comprimento" step="0.1" placeholder="Ex: 4.0"></label>
+                <label>Base da Seção (mm): <input type="number" id="viga-base" step="1" placeholder="Ex: 100"></label>
+                <label>Altura da Seção (mm): <input type="number" id="viga-altura" step="1" placeholder="Ex: 200"></label>
+                <button onclick="calcularPropriedadesSecao()">Definir Perfil</button>
+            </div>
+            <div class="node-list" id="resultado-perfil"></div>
+        </section>
+
+        <section class="step-section" id="viga-passo2" style="opacity: 0.5;">
+            <h2>2. Condições de Apoio</h2>
+            <p>Defina o tipo de vinculação da viga (Biapoiada, Engastada/Em Balanço).</p>
+            <div class="input-group">
+                <label>Configuração:
+                    <select id="viga-apoio" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="biapoiada">Biapoiada (Apoio Simples + Articulação)</option>
+                        <option value="balanco">Engastada (Em Balanço)</option>
+                    </select>
+                </label>
+            </div>
+        </section>
+
+        <section class="step-section" id="viga-passo3" style="opacity: 0.5;">
+            <h2>3. Cargas Aplicadas (Forças e Momentos)</h2>
+            <p>Adicione cargas concentradas ou distribuídas retangularmente ao longo do vão.</p>
+            <div class="input-group">
+                <label>Tipo de Carga:
+                    <select id="viga-tipo-carga" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="concentrada">Concentrada (kN)</option>
+                        <option value="distribuida">Distribuída (kN/m)</option>
+                    </select>
+                </label>
+                <label>Magnitude: <input type="number" id="viga-carga-val" step="0.1" placeholder="Ex: 15.0"></label>
+                <label>Posição X (m): <input type="number" id="viga-carga-pos" step="0.1" placeholder="Ex: 2.0"></label>
+                <button onclick="alert('Carga adicionada para o processamento de diagramas.')">Adicionar Carga</button>
+            </div>
+        </section>
+
+        <section class="step-section" id="viga-passo4" style="opacity: 0.5;">
+            <h2>4. Dimensionamento à Flexão</h2>
+            <p>Cálculo da Tensão Normal Máxima ($\sigma_{max}$) baseada na fórmula da flexão de Hibbeler:</p>
+            <div style="text-align: center; margin: 1rem 0; font-size: 1.2rem;">
+                $$\sigma_{max} = \frac{M \cdot c}{I}$$
+            </div>
+            <p>Onde $M$ é o Momento Fletor Máximo, $c$ é a distância da linha neutra à fibra mais distante, e $I$ é o Momento de Inércia da área.</p>
+        </section>
+
+        <button class="btn-calcular" onclick="alert('Processando Reações, Cortantes, Momentos e Tensões Admissíveis...')">Calcular Viga</button>
+    </main>
+
+</body>
+</html>
