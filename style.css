@@ -1,8 +1,9 @@
-/* página inicial */
+/* página inicial e global */
 :root {
     --primary-color: #000000;
     --secondary-color: #a19d85;
     --text-color: #030303;
+    --bg-card: #ffffff;
 }
 
 body {
@@ -36,6 +37,73 @@ h2 {
     padding-bottom: 0.5rem;
 }
 
+/* Regras do Dashboard (Página Inicial) */
+.dashboard-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.card {
+    background: var(--bg-card);
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    flex: 1 1 calc(50% - 1.5rem); /* Dois cards por linha no desktop */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+.card p {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+}
+
+.card.disabled {
+    opacity: 0.6;
+    background-color: #f9f9f9;
+}
+
+/* Botões e Links */
+.btn-link {
+    display: inline-block;
+    text-align: center;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-link:hover {
+    background-color: #333333;
+}
+
+.btn-disabled {
+    background-color: #cccccc;
+    color: #666666;
+    border: none;
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: not-allowed;
+    width: 100%;
+}
+
+/* Estilos da página de cálculo (Treliças) */
 .step-section {
     margin-bottom: 2rem;
     padding: 1rem;
@@ -45,6 +113,7 @@ h2 {
 
 .input-group {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 1rem;
     align-items: center;
@@ -69,7 +138,7 @@ button {
 }
 
 button:hover {
-    background-color: #004494;
+    background-color: #333333;
 }
 
 .btn-calcular {
@@ -80,4 +149,21 @@ button:hover {
 
 .node-list {
     margin-top: 1rem;
+}
+
+.btn-voltar {
+    display: inline-block;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.btn-voltar:hover {
+    background-color: var(--primary-color);
+    color: white;
 }
