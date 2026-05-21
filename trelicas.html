@@ -14,50 +14,73 @@
     </header>
 
     <main>
-        <div style="margin-bottom: 1.5rem;">
-            <a href="index.html" class="btn-voltar">← Voltar para a Página Inicial</a>
+        <a href="index.html" class="btn-voltar">← Voltar para a Página Inicial</a>
+
+        <div class="calc-container">
+            <div class="inputs-panel">
+                <section class="step-section" id="passo1">
+                    <h2>1. Definir Nós</h2>
+                    <p>Coordenadas (X, Y) em metros.</p>
+                    
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>ID</label>
+                            <input type="text" id="node-id" placeholder="A" maxlength="2">
+                        </div>
+                        <div class="input-field">
+                            <label>X (m)</label>
+                            <input type="number" id="node-x" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="input-field">
+                            <label>Y (m)</label>
+                            <input type="number" id="node-y" step="0.1" placeholder="0.0">
+                        </div>
+                        <button class="btn-add" onclick="adicionarNo()">+ Nó</button>
+                    </div>
+
+                    <div class="data-list" id="lista-nos">
+                        <strong>Nós:</strong>
+                        <ul id="ul-nos"></ul>
+                    </div>
+                </section>
+
+                <section class="step-section" id="passo2">
+                    <h2>2. Definir Barras</h2>
+                    <p>Conecte dois nós.</p>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Nó 1</label>
+                            <input type="text" id="bar-start" placeholder="A" maxlength="2">
+                        </div>
+                        <div class="input-field">
+                            <label>Nó 2</label>
+                            <input type="text" id="bar-end" placeholder="B" maxlength="2">
+                        </div>
+                        <button class="btn-add" onclick="adicionarBarra()">+ Barra</button>
+                    </div>
+                    <div class="data-list">
+                        <strong>Barras:</strong>
+                        <ul id="ul-barras"></ul>
+                    </div>
+                </section>
+
+                <section class="step-section" id="passo3">
+                    <h2>3. Adicionar Apoios e Cargas</h2>
+                    <p>Em breve: Lógica de cálculo.</p>
+                </section>
+
+                <button class="btn-calcular" onclick="alert('Lógica de cálculo matricial necessária.')">Calcular Esforços</button>
+            </div>
+
+            <div class="graph-panel">
+                <h3>Visualização 2D</h3>
+                <p style="font-size:0.8rem; color:#666;">Cotas em metros.</p>
+                <canvas id="canvasTrelica" width="500" height="400"></canvas>
+                <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%;" onclick="limparTudo()">Limpar Tudo</button>
+            </div>
         </div>
-
-        <section class="step-section" id="passo1">
-            <h2>1. Definir Nós da Treliça</h2>
-            <p>Forneça a localização no plano (coordenadas X e Y) de todos os nós da treliça.</p>
-            
-            <div class="input-group">
-                <label>Nomeie o Nó: <input type="text" id="node-id" placeholder="Ex: A" maxlength="2"></label>
-                <label>Coordenada X: <input type="number" id="node-x" step="0.01" placeholder="0.0"></label>
-                <label>Coordenada Y: <input type="number" id="node-y" step="0.01" placeholder="0.0"></label>
-                <button onclick="adicionarNo()">Adicionar Nó</button>
-            </div>
-
-            <div class="node-list" id="lista-nos">
-                <strong>Nós Adicionados:</strong>
-                <ul id="ul-nos"></ul>
-            </div>
-        </section>
-
-        <section class="step-section" id="passo2" style="opacity: 0.5;">
-            <h2>2. Definir Elementos (Barras)</h2>
-            <p>Especifique quais nós pertencem a um mesmo elemento para conectá-los.</p>
-            <div class="input-group">
-                <label>Nó de Início: <input type="text" id="bar-start" placeholder="Ex: A" maxlength="2" style="width: 70px;"></label>
-                <label>Nó de Fim: <input type="text" id="bar-end" placeholder="Ex: B" maxlength="2" style="width: 70px;"></label>
-                <button onclick="alert('Lógica de adicionar barras será implementada aqui!')">Conectar Nós (Barra)</button>
-            </div>
-        </section>
-
-        <section class="step-section" id="passo3" style="opacity: 0.5;">
-            <h2>3. Adicionar Vínculos</h2>
-            <p>Especifique os vínculos que mantêm a treliça equilibrada (pino, rolete, etc.).</p>
-        </section>
-
-        <section class="step-section" id="passo4" style="opacity: 0.5;">
-            <h2>4. Aplicar Forças</h2>
-            <p>Forneça a intensidade e direção das forças e em quais nós estão aplicadas.</p>
-        </section>
-
-        <button class="btn-calcular">Calcular Treliça</button>
     </main>
 
-    <script src="script.js"></script>
+    <script src="script_trelicas.js"></script>
 </body>
 </html>
