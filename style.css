@@ -1,43 +1,86 @@
-/* página inicial e global */
+/* --- Variáveis Globais e Reset --- */
 :root {
-    --primary-color: #000000;
-    --secondary-color: #a19d85;
+    --primary-color: #000000; /* Preto */
+    --secondary-color: #a19d85; /* Bege/Safari */
+    --accent-color: #d4af37; /* Ouro para destaques */
     --text-color: #030303;
     --bg-card: #ffffff;
+    --bg-page: #f4f4f2;
+    --border-color: #ddd;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* --- Header --- */
 header {
     background-color: var(--primary-color);
     color: white;
-    padding: 1.5rem;
+    padding: 2rem 1rem;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    font-weight: 300;
+    opacity: 0.8;
+}
+
+/* --- Main Layout --- */
 main {
-    max-width: 900px;
+    max-width: 1200px; /* Aumentado para acomodar gráfico + inputs */
     margin: 2rem auto;
+    padding: 0 1rem;
+    padding-bottom: 3rem;
+}
+
+/* Conteiner para separar inputs do gráfico nas páginas internas */
+.calc-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.inputs-panel {
+    flex: 1 1 400px;
+}
+
+.graph-panel {
+    flex: 1 1 500px;
     background: white;
-    padding: 2rem;
+    padding: 1rem;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: sticky; /* Mantém o gráfico visível ao rolar */
+    top: 1rem;
+    height: fit-content;
 }
 
-h2 {
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 0.5rem;
+canvas {
+    width: 100%;
+    height: auto;
+    background-color: #fff;
+    border: 1px solid #eee;
+    margin-top: 1rem;
 }
 
-/* Regras do Dashboard (Página Inicial) */
+/* --- Dashboard (Index) --- */
 .dashboard-grid {
     display: flex;
     flex-wrap: wrap;
@@ -47,108 +90,148 @@ h2 {
 
 .card {
     background: var(--bg-card);
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 1.5rem;
-    flex: 1 1 calc(50% - 1.5rem); /* Dois cards por linha no desktop */
-    box-sizing: border-box;
+    padding: 2rem;
+    flex: 1 1 calc(33.333% - 1.5rem);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:not(.disabled):hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .card h3 {
-    margin-top: 0;
+    font-size: 1.5rem;
     color: var(--primary-color);
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
 }
 
 .card p {
     color: #555;
+    margin-bottom: 2rem;
     font-size: 0.95rem;
-    line-height: 1.4;
-    margin-bottom: 1.5rem;
 }
 
 .card.disabled {
     opacity: 0.6;
     background-color: #f9f9f9;
+    border-style: dashed;
 }
 
-/* Botões e Links */
-.btn-link {
-    display: inline-block;
-    text-align: center;
-    background-color: var(--primary-color);
-    color: white;
-    text-decoration: none;
-    padding: 0.7rem 1rem;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: background 0.3s;
-}
-
-.btn-link:hover {
-    background-color: #333333;
-}
-
-.btn-disabled {
-    background-color: #cccccc;
-    color: #666666;
-    border: none;
-    padding: 0.7rem 1rem;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: not-allowed;
-    width: 100%;
-}
-
-/* Estilos da página de cálculo (Treliças) */
+/* --- Seções de Passo a Passo --- */
 .step-section {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    background: white;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+}
+
+.step-section h2 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .input-group {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-bottom: 1rem;
-    align-items: center;
+    margin-top: 1rem;
+    align-items: flex-end;
 }
 
-input {
-    padding: 0.5rem;
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.input-field label {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #555;
+}
+
+input, select {
+    padding: 0.6rem;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+input[type="number"] {
     width: 100px;
 }
 
-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
+input[type="text"] {
+    width: 80px;
 }
 
-button:hover {
-    background-color: #333333;
+/* --- Botões --- */
+button {
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: none;
+    font-size: 0.9rem;
+}
+
+.btn-add {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.btn-add:hover {
+    background-color: #8a8670;
+}
+
+.btn-link {
+    display: block;
+    text-align: center;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    padding: 0.8rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.btn-link:hover {
+    background-color: #333;
+}
+
+.btn-disabled {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    width: 100%;
 }
 
 .btn-calcular {
     width: 100%;
     padding: 1rem;
     font-size: 1.1rem;
+    background-color: var(--primary-color);
+    color: white;
+    margin-top: 1rem;
 }
 
-.node-list {
-    margin-top: 1rem;
+.btn-calcular:hover {
+    background-color: #333;
 }
 
 .btn-voltar {
@@ -156,14 +239,42 @@ button:hover {
     color: var(--primary-color);
     text-decoration: none;
     font-weight: bold;
-    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
     padding: 0.5rem 1rem;
     border: 1px solid var(--primary-color);
     border-radius: 4px;
-    transition: all 0.3s ease;
 }
 
 .btn-voltar:hover {
     background-color: var(--primary-color);
     color: white;
+}
+
+/* --- Listas e Resultados --- */
+.data-list {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.data-list ul {
+    list-style: none;
+    padding-left: 0.5rem;
+}
+
+.data-list li {
+    border-bottom: 1px solid #eee;
+    padding: 0.25rem 0;
+}
+
+.result-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f4f4f2;
+    border-left: 4px solid var(--secondary-color);
+    font-size: 0.9rem;
 }
