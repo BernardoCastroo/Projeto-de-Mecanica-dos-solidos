@@ -3,57 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Treliças - Mecânica dos Sólidos</title>
+    <title>Portal de Engenharia - Mecânica dos Sólidos</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>Cálculo de Treliças</h1>
-        <p>Projeto de Mecânica dos Sólidos</p>
+        <h1>Portal Mecânica dos Sólidos</h1>
+        <p>Selecione a ferramenta de cálculo desejada</p>
     </header>
 
     <main>
-        <section class="step-section" id="passo1">
-            <h2>1. Definir Nós da Treliça</h2>
-            <p>Forneça a localização no plano (coordenadas X e Y) de todos os nós da treliça.</p>
-            
-            <div class="input-group">
-                <label>Nomeie o Nó: <input type="text" id="node-id" placeholder="Ex: A" maxlength="2"></label>
-                <label>Coordenada X: <input type="number" id="node-x" step="0.01" placeholder="0.0"></label>
-                <label>Coordenada Y: <input type="number" id="node-y" step="0.01" placeholder="0.0"></label>
-                <button onclick="adicionarNo()">Adicionar Nó</button>
+        <h2 style="text-align: center; border: none; margin-bottom: 2rem;">Módulos de Cálculo Disponíveis</h2>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Calculadora de Treliças</h3>
+                <p>Defina nós, barras, vínculos e cargas para calcular os esforços internos nas barras pelo método dos nós ou seções.</p>
+                <a href="trelicas.html" class="btn-link">Acessar Calculadora</a>
             </div>
 
-            <div class="node-list" id="lista-nos">
-                <strong>Nós Adicionados:</strong>
-                <ul id="ul-nos">
-                    </ul>
+            <div class="card disabled">
+                <h3>Análise de Vigas (Em breve)</h3>
+                <p>Cálculo de reações de apoio, diagramas de esforço cortante e momento fletor para vigas biapoiadas ou engastadas.</p>
+                <button class="btn-disabled" disabled>Indisponível</button>
             </div>
-        </section>
-
-        <section class="step-section" id="passo2" style="opacity: 0.5;">
-            <h2>2. Definir Elementos (Barras)</h2>
-            <p>Especifique quais nós pertencem a um mesmo elemento para conectá-los.</p>
-                <label>Nomeie o Nó: <input type="text" id="node-id" placeholder="Ex: A" maxlength="2"></label>
-                <label>Coordenada X: <input type="number" id="node-x" step="0.01" placeholder="0.0"></label>
-                <label>Coordenada Y: <input type="number" id="node-y" step="0.01" placeholder="0.0"></label>
-                <button onclick="adicionarNo()">Adicionar Nó</button>
-        </section>
-
-        <section class="step-section" id="passo3" style="opacity: 0.5;">
-            <h2>3. Adicionar Vínculos</h2>
-            <p>Especifique os vínculos que mantêm a treliça equilibrada (pino, rolete, etc.).</p>
-        </section>
-
-        <section class="step-section" id="passo4" style="opacity: 0.5;">
-            <h2>4. Aplicar Forças</h2>
-            <p>Forneça a intensidade e direção das forças e em quais nós estão aplicadas.</p>
-        </section>
-
-        <button class="btn-calcular">Calcular Treliça</button>
+        </div>
     </main>
 
-    <script src="script.js"></script>
 </body>
 </html>
