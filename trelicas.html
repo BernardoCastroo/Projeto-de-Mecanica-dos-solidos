@@ -64,87 +64,103 @@
                     </div>
                 </section>
 
-  <section class="step-section" id="passo3">
-    <h2>3. Adicionar Apoios (Vínculos)</h2>
-    <p>Especifique os vínculos nos nós.</p>
-    
-    <div class="input-group">
-        <div class="input-field">
-            <label>Nó</label>
-            <input type="text" id="apoio-node" placeholder="A" maxlength="2">
-        </div>
-        <div class="input-field">
-            <label>Tipo de Apoio</label>
-            <select id="apoio-tipo" style="width: 130px;">
-                <option value="pino">Pino (Fixo)</option>
-                <option value="rolete">Rolete (Móvel)</option>
-            </select>
-        </div>
-        <button class="btn-add" onclick="adicionarApoio()">+ Apoio</button>
-    </div>
+                <section class="step-section" id="passo3">
+                    <h2>3. Adicionar Apoios (Vínculos)</h2>
+                    <p>Especifique os vínculos nos nós.</p>
+                    
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Nó</label>
+                            <input type="text" id="apoio-node" placeholder="A" maxlength="2">
+                        </div>
+                        <div class="input-field">
+                            <label>Tipo de Apoio</label>
+                            <select id="apoio-tipo" style="width: 130px;">
+                                <option value="pino">Pino (Fixo)</option>
+                                <option value="rolete">Rolete (Móvel)</option>
+                            </select>
+                        </div>
+                        <button class="btn-add" onclick="adicionarApoio()">+ Apoio</button>
+                    </div>
 
-    <div class="data-list" id="lista-apoios">
-        <strong>Apoios Adicionados:</strong>
-        <ul id="ul-apoios"></ul>
-    </div>
-</section>
-<section class="step-section" id="passo4">
-    <h2>4. Adicionar Forças (Cargas)</h2>
-    <p>Defina o módulo, o ângulo e a ação da força no nó.</p>
-    
-    <div class="guia-angulos-container">
-        <strong class="guia-angulos-titulo">Tabela de Ângulos (Direção da Força):</strong>
-        <table class="guia-angulos-tabela">
-            <tr>
-                <td><strong>0°</strong> ➡️ Direita</td>
-                <td><strong>90°</strong> ⬆️ Cima</td>
-            </tr>
-            <tr>
-                <td><strong>180°</strong> ⬅️ Esquerda</td>
-                <td><strong>270°</strong> ⬇️ Baixo</td>
-            </tr>
-        </table>
-    </div>
+                    <div class="data-list" id="lista-apoios">
+                        <strong>Apoios Adicionados:</strong>
+                        <ul id="ul-apoios"></ul>
+                    </div>
+                </section>
 
-    <div class="input-group">
-        <div class="input-field">
-            <label>Nó</label>
-            <input type="text" id="forca-node" placeholder="A" maxlength="2" style="width: 50px;">
-        </div>
-        <div class="input-field">
-            <label>Valor (kN)</label>
-            <input type="number" id="forca-mod" step="0.1" placeholder="10.0" style="width: 80px;">
-        </div>
-        <div class="input-field">
-            <label>Ângulo (°)</label>
-            <input type="number" id="forca-ang" step="1" placeholder="0" style="width: 80px;" title="Ex: 0=Direita, 90=Cima, 270=Baixo">
-        </div>
-        <div class="input-field">
-            <label>Ação</label>
-            <select id="forca-sentido" style="width: 130px;">
-                <option value="saindo">↗ Puxando</option>
-                <option value="entrando">↘ Empurrando</option>
-            </select>
-        </div>
-        <button class="btn-add" onclick="adicionarForca()">+ Força</button>
-    </div>
+                <section class="step-section" id="passo4">
+                    <h2>4. Adicionar Forças (Cargas)</h2>
+                    <p>Defina o módulo, o ângulo e a ação da força no nó.</p>
+                    
+                    <div class="guia-angulos-container">
+                        <strong class="guia-angulos-titulo">Tabela de Ângulos (Direção da Força):</strong>
+                        <table class="guia-angulos-tabela">
+                            <tr>
+                                <td><strong>0°</strong> ➡️ Direita</td>
+                                <td><strong>90°</strong> ⬆️ Cima</td>
+                            </tr>
+                            <tr>
+                                <td><strong>±180°</strong> ⬅️ Esquerda</td>
+                                <td><strong>-90°</strong> ⬇️ Baixo</td>
+                            </tr>
+                        </table>
+                    </div>
 
-    <div class="data-list" id="lista-forcas">
-        <strong>Forças Adicionadas:</strong>
-        <ul id="ul-forcas"></ul>
-    </div>
-</section>
-                <button class="btn-calcular" onclick="alert('Lógica de cálculo matricial necessária.')">Calcular Esforços</button>
+                    <div class="input-group">
+                        <div class="input-field">
+                            <label>Nó</label>
+                            <input type="text" id="forca-node" placeholder="A" maxlength="2" style="width: 50px;">
+                        </div>
+                        <div class="input-field">
+                            <label>Valor (kN)</label>
+                            <input type="number" id="forca-mod" step="0.1" placeholder="10.0" style="width: 80px;">
+                        </div>
+                        <div class="input-field">
+                            <label>Ângulo (°)</label>
+                            <input type="number" id="forca-ang" step="1" placeholder="0" style="width: 80px;" title="Ex: 0=Direita, 90=Cima, -90=Baixo">
+                        </div>
+                        <div class="input-field">
+                            <label>Ação</label>
+                            <select id="forca-sentido" style="width: 130px;">
+                                <option value="saindo">↗ Puxando</option>
+                                <option value="entrando">↘ Empurrando</option>
+                            </select>
+                        </div>
+                        <button class="btn-add" onclick="adicionarForca()">+ Força</button>
+                    </div>
+
+                    <div class="data-list" id="lista-forcas">
+                        <strong>Forças Adicionadas:</strong>
+                        <ul id="ul-forcas"></ul>
+                    </div>
+                </section>
+
+                <button class="btn-calcular" onclick="calcularEsforcos()">Calcular Esforços</button>
             </div>
 
             <div class="graph-panel">
                 <h3>Visualização 2D</h3>
                 <p style="font-size:0.8rem; color:#666;">Cotas em metros.</p>
+                
                 <canvas id="canvasTrelica" width="500" height="500"></canvas>
                 <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%;" onclick="limparTudo()">Limpar Tudo</button>
+                
+                <div id="lousa-resultados" class="lousa" style="display: none;">
+                    <h4>Cálculo</h4>
+                    <div id="lousa-texto"></div>
+                </div>
             </div>
         </div>
     </main>
+
+    <div id="modal-alerta" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="alerta-titulo">Aviso</h3>
+            <p id="alerta-mensagem">Mensagem de erro aqui.</p>
+            <button onclick="fecharAlerta()">Entendi</button>
+        </div>
+    </div>
 
     <script src="script_trelicas.js"></script>
 </body>

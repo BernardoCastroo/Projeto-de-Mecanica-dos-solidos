@@ -43,13 +43,13 @@ header p {
 
 /* --- Main Layout --- */
 main {
-    max-width: 1200px; /* Aumentado para acomodar gráfico + inputs */
+    max-width: 1200px;
     margin: 2rem auto;
     padding: 0 1rem;
     padding-bottom: 3rem;
 }
 
-/* Conteiner para separar inputs do gráfico nas páginas internas */
+/* Conteiner para separar inputs do gráfico */
 .calc-container {
     display: flex;
     flex-wrap: wrap;
@@ -67,7 +67,7 @@ main {
     border-radius: 8px;
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    position: sticky; /* Mantém o gráfico visível ao rolar */
+    position: sticky;
     top: 1rem;
     height: fit-content;
 }
@@ -278,11 +278,12 @@ button {
     border-left: 4px solid var(--secondary-color);
     font-size: 0.9rem;
 }
-/* --- Tabela Guia de Ângulos (Treliças) --- */
+
+/* --- Tabela Guia de Ângulos --- */
 .guia-angulos-container {
     margin: 10px 0;
     padding: 10px;
-    background-color: #ededeb; /* Um tom sutil para destacar do fundo branco do card */
+    background-color: #ededeb;
     border-left: 4px solid var(--secondary-color);
     border-radius: 4px;
     font-size: 0.85rem;
@@ -302,5 +303,96 @@ button {
 
 .guia-angulos-tabela td {
     padding: 4px 0;
-    width: 50%; /* Divide o espaço igualmente em duas colunas */
+    width: 50%;
 }
+
+/* --- Modal de Alerta Customizado --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border-top: 5px solid #d9534f;
+    animation: deslizar 0.3s ease-out;
+}
+
+.modal-content h3 {
+    color: #d9534f;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+}
+
+.modal-content p {
+    color: #555;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.modal-content button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.6rem 2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.modal-content button:hover {
+    background-color: #333;
+}
+
+@keyframes deslizar {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Lousa de Resultados (Quadro de Engenharia) --- */
+.lousa {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1.5rem;
+    font-family: 'Consolas', 'Courier New', monospace;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+    border: 3px solid #1a252f;
+    animation: deslizar 0.4s ease-out;
+}
+
+.lousa h4 {
+    color: #f1c40f;
+    margin-bottom: 1rem;
+    border-bottom: 1px dashed #7f8c8d;
+    padding-bottom: 0.5rem;
+    font-family: 'Segoe UI', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.lousa #lousa-texto p {
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+}
+
+.destaque-tracao { color: #5dade2; font-weight: bold; }
+.destaque-compressao { color: #e74c3c; font-weight: bold; }
+.destaque-zero { color: #95a5a6; font-style: italic; }
