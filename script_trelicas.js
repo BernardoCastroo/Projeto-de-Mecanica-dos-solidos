@@ -1,7 +1,8 @@
 // Banco de dados da estrutura
 let nos = {}; 
 let barras = []; 
-let apoios = {}; // <--- NOVO: Guarda os apoios (ex: { 'A': 'pino' })
+let apoios = {}; 
+let forcas = []; 
 
 // Configurações do Canvas
 const canvas = document.getElementById('canvasTrelica');
@@ -11,7 +12,7 @@ const padding = 40;
 // Escala Fixa para caber de 0 a 10
 const escala = (canvas.width - 2 * padding) / 10; 
 
-// --- Funções de Interface e Validação ---
+// --- Funções de Nós ---
 
 function adicionarNo() {
     const idInput = document.getElementById('node-id');
@@ -32,23 +33,19 @@ function adicionarNo() {
         return;
     }
 
-    // 1. Verifica se o NOME (ID) já existe
     if (nos[id]) {
         alert("Um nó com esse ID já existe.");
         return;
     }
 
-    // 2. NOVO: Verifica se as COORDENADAS já estão ocupadas por outro nó
     const coordExiste = Object.values(nos).some(n => n.x === x && n.y === y);
     if (coordExiste) {
         alert(`Já existe um nó nessas exatas coordenadas (${x}, ${y}). Escolha outra posição.`);
         return;
     }
 
-    // Salva no objeto
     nos[id] = { x: x, y: y };
 
-    // Atualiza a lista da tela e redesenha
     atualizarListaNos();
     desenharEstrutura();
 
@@ -60,7 +57,7 @@ function adicionarNo() {
 
 function atualizarListaNos() {
     const ul = document.getElementById('ul-nos');
-    ul.innerHTML = ''; // Limpa a lista para reconstruir
+    ul.innerHTML = ''; 
 
     Object.keys(nos).forEach(id => {
         const li = document.createElement('li');
@@ -72,7 +69,6 @@ function atualizarListaNos() {
         const span = document.createElement('span');
         span.textContent = `Nó ${id}: (${nos[id].x.toFixed(1)}, ${nos[id].y.toFixed(1)}) m`;
 
-        // Botão X Vermelho para deletar o Nó
         const btnRemover = document.createElement('button');
         btnRemover.textContent = 'x';
         btnRemover.style.padding = '2px 8px';
@@ -94,25 +90,17 @@ function atualizarListaNos() {
 function removerNo(idParaRemover) {
     delete nos[idParaRemover];
     barras = barras.filter(barra => barra[0] !== idParaRemover && barra[1] !== idParaRemover);
-    
-    // NOVO: Remove o apoio se o nó for apagado
     delete apoios[idParaRemover]; 
+    forcas = forcas.filter(f => f.node !== idParaRemover); 
 
     atualizarListaNos();
     atualizarListaBarras();
-    atualizarListaApoios(); // Atualiza a tela
+    atualizarListaApoios(); 
+    atualizarListaForcas();
     desenharEstrutura();
 }
 
-function limparTudo() {
-    nos = {};
-    barras = [];
-    apoios = {}; // Limpa os apoios
-    atualizarListaNos();
-    atualizarListaBarras();
-    atualizarListaApoios();
-    desenharEstrutura();
-}
+// --- Funções de Barras ---
 
 function adicionarBarra() {
     const startInput = document.getElementById('bar-start');
@@ -150,7 +138,6 @@ function atualizarListaBarras() {
         const n1 = barra[0];
         const n2 = barra[1];
 
-        // Cálculo do comprimento da barra (Pitágoras)
         const dx = nos[n2].x - nos[n1].x;
         const dy = nos[n2].y - nos[n1].y;
         const comp = Math.sqrt(dx*dx + dy*dy);
@@ -164,7 +151,6 @@ function atualizarListaBarras() {
         const span = document.createElement('span');
         span.textContent = `Barra ${n1}-${n2}: L = ${comp.toFixed(2)} m`;
 
-        // Botão X Vermelho para deletar a Barra
         const btnRemover = document.createElement('button');
         btnRemover.textContent = 'x';
         btnRemover.style.padding = '2px 8px';
@@ -184,14 +170,13 @@ function atualizarListaBarras() {
 }
 
 function removerBarra(indexParaRemover) {
-    // Remove a barra do array usando o índice dela
     barras.splice(indexParaRemover, 1);
-    
     atualizarListaBarras();
     desenharEstrutura();
 }
 
-// --- Lógica dos Apoios ---
+// --- Funções de Apoios ---
+
 function adicionarApoio() {
     const nodeInput = document.getElementById('apoio-node');
     const tipoInput = document.getElementById('apoio-tipo');
@@ -259,6 +244,102 @@ function removerApoio(id) {
     desenharEstrutura();
 }
 
+// --- Funções de Forças ---
+
+function adicionarForca() {
+    const nodeInput = document.getElementById('forca-node');
+    const modInput = document.getElementById('forca-mod');
+    const angInput = document.getElementById('forca-ang');
+    const sentidoInput = document.getElementById('forca-sentido');
+
+    const id = nodeInput.value.toUpperCase().trim();
+    const mod = parseFloat(modInput.value);
+    const ang = parseFloat(angInput.value);
+    const sentido = sentidoInput.value;
+
+    if (!id || isNaN(mod) || isNaN(ang)) {
+        alert("Preencha todos os campos da força corretamente.");
+        return;
+    }
+    if (!nos[id]) {
+        alert(`O nó "${id}" não existe! Crie-o primeiro no Passo 1.`);
+        return;
+    }
+
+    const rad = ang * Math.PI / 180;
+    // MATEMÁTICA CORRIGIDA: A força em X e Y sempre segue o ângulo rigidamente.
+    const fx = mod * Math.cos(rad);
+    const fy = mod * Math.sin(rad);
+
+    forcas.push({
+        node: id,
+        mod: mod,
+        ang: ang,
+        sentido: sentido,
+        fx: fx,
+        fy: fy
+    });
+
+    atualizarListaForcas();
+    desenharEstrutura();
+
+    nodeInput.value = '';
+    modInput.value = '';
+    angInput.value = '';
+    nodeInput.focus();
+}
+
+function atualizarListaForcas() {
+    const ul = document.getElementById('ul-forcas');
+    ul.innerHTML = '';
+
+    forcas.forEach((f, index) => {
+        const li = document.createElement('li');
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.style.marginBottom = '8px';
+
+        const span = document.createElement('span');
+        const acao = f.sentido === 'saindo' ? 'Puxando' : 'Empurrando';
+        span.textContent = `Nó ${f.node}: ${f.mod} kN a ${f.ang}° (${acao})`;
+
+        const btnRemover = document.createElement('button');
+        btnRemover.textContent = 'x';
+        btnRemover.style.padding = '2px 8px';
+        btnRemover.style.backgroundColor = 'transparent';
+        btnRemover.style.color = '#dc3545';
+        btnRemover.style.border = 'none';
+        btnRemover.style.cursor = 'pointer';
+        btnRemover.style.fontWeight = 'bold';
+        btnRemover.style.fontSize = '14px';
+        
+        btnRemover.onclick = () => removerForca(index);
+
+        li.appendChild(span);
+        li.appendChild(btnRemover);
+        ul.appendChild(li);
+    });
+}
+
+function removerForca(index) {
+    forcas.splice(index, 1);
+    atualizarListaForcas();
+    desenharEstrutura();
+}
+
+function limparTudo() {
+    nos = {};
+    barras = [];
+    apoios = {}; 
+    forcas = []; 
+    atualizarListaNos();
+    atualizarListaBarras();
+    atualizarListaApoios();
+    atualizarListaForcas();
+    desenharEstrutura();
+}
+
 // --- Motor Gráfico 2D ---
 
 const toPx = (xReal, yReal) => {
@@ -271,7 +352,7 @@ const toPx = (xReal, yReal) => {
 function desenharEstrutura() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Desenha Eixos e Números
+    // 1. Desenha Eixos e Números
     ctx.strokeStyle = '#bbb';
     ctx.fillStyle = '#555';
     ctx.font = '11px Arial';
@@ -303,7 +384,7 @@ function desenharEstrutura() {
         }
     }
 
-    // Desenha as Barras
+    // 2. Desenha as Barras
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
@@ -320,9 +401,7 @@ function desenharEstrutura() {
         }
     });
 
-    // ... (código dos eixos e barras)
-
-    // DESENHAR APOIOS (VÍNCULOS)
+    // 3. Desenhar Apoios (Vínculos)
     Object.keys(apoios).forEach(id => {
         const noReal = nos[id];
         if (!noReal) return;
@@ -333,33 +412,85 @@ function desenharEstrutura() {
         ctx.lineWidth = 2;
 
         if (apoios[id] === 'pino') {
-            // Desenha um triângulo para o Pino
             ctx.beginPath();
             ctx.moveTo(px.x, px.y + 6); 
             ctx.lineTo(px.x - 12, px.y + 25);
             ctx.lineTo(px.x + 12, px.y + 25);
             ctx.closePath();
             ctx.fill(); ctx.stroke();
-            // Linha de terra
             ctx.beginPath(); ctx.moveTo(px.x - 18, px.y + 25); ctx.lineTo(px.x + 18, px.y + 25); ctx.stroke();
         } else if (apoios[id] === 'rolete') {
-            // Desenha um triângulo com rodinhas para o Rolete
             ctx.beginPath();
             ctx.moveTo(px.x, px.y + 6);
             ctx.lineTo(px.x - 10, px.y + 20);
             ctx.lineTo(px.x + 10, px.y + 20);
             ctx.closePath();
             ctx.fill(); ctx.stroke();
-            // Rodinhas
             ctx.beginPath(); ctx.arc(px.x - 5, px.y + 24, 4, 0, 2*Math.PI); ctx.stroke();
             ctx.beginPath(); ctx.arc(px.x + 5, px.y + 24, 4, 0, 2*Math.PI); ctx.stroke();
-            // Linha de terra
             ctx.beginPath(); ctx.moveTo(px.x - 18, px.y + 28); ctx.lineTo(px.x + 18, px.y + 28); ctx.stroke();
         }
     });
 
-    // 3. DESENHAR NÓS
-    // ... (restante do código)
+    // 4. Desenhar Forças (Visual Corrigido)
+    forcas.forEach(f => {
+        const noReal = nos[f.node];
+        if (!noReal) return;
+        const px = toPx(noReal.x, noReal.y);
+
+        const rad = f.ang * Math.PI / 180;
+        const canvasAngle = -rad; 
+        const arrowLength = 40;
+        const offset = 18; // Distância maior para evitar sobreposição com o texto do nó
+
+        let startX, startY, endX, endY, textX, textY;
+
+        if (f.sentido === 'saindo') {
+            // Puxando: A cauda fica no nó, a ponta vai embora.
+            startX = px.x + Math.cos(canvasAngle) * offset;
+            startY = px.y + Math.sin(canvasAngle) * offset;
+            endX = startX + Math.cos(canvasAngle) * arrowLength;
+            endY = startY + Math.sin(canvasAngle) * arrowLength;
+            textX = endX + Math.cos(canvasAngle) * 15;
+            textY = endY + Math.sin(canvasAngle) * 15;
+        } else {
+            // Empurrando: A ponta fica no nó, a cauda vem de longe.
+            endX = px.x - Math.cos(canvasAngle) * offset;
+            endY = px.y - Math.sin(canvasAngle) * offset;
+            startX = endX - Math.cos(canvasAngle) * arrowLength;
+            startY = endY - Math.sin(canvasAngle) * arrowLength;
+            textX = startX - Math.cos(canvasAngle) * 15;
+            textY = startY - Math.sin(canvasAngle) * 15;
+        }
+
+        ctx.strokeStyle = '#d9534f';
+        ctx.fillStyle = '#d9534f';
+        ctx.lineWidth = 2.5;
+
+        // Linha principal
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        // Cabeça da seta
+        ctx.save();
+        ctx.translate(endX, endY);
+        ctx.rotate(canvasAngle);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-10, -5);
+        ctx.lineTo(-10, 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // Texto do Módulo
+        ctx.font = 'bold 11px Arial';
+        ctx.fillText(`${f.mod} kN`, textX, textY);
+    });
+
+    // 5. Desenhar Nós
     Object.keys(nos).forEach(id => {
         const noReal = nos[id];
         const noPx = toPx(noReal.x, noReal.y);
@@ -383,4 +514,5 @@ function desenharEstrutura() {
     });
 }
 
+// Inicia o Canvas renderizado
 desenharEstrutura();

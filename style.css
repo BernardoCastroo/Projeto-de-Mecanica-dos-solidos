@@ -278,3 +278,29 @@ button {
     border-left: 4px solid var(--secondary-color);
     font-size: 0.9rem;
 }
+/* --- Tabela Guia de Ângulos (Treliças) --- */
+.guia-angulos-container {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #ededeb; /* Um tom sutil para destacar do fundo branco do card */
+    border-left: 4px solid var(--secondary-color);
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.guia-angulos-titulo {
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.guia-angulos-tabela {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+
+.guia-angulos-tabela td {
+    padding: 4px 0;
+    width: 50%; /* Divide o espaço igualmente em duas colunas */
+}
