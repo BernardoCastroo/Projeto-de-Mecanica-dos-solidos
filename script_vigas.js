@@ -117,9 +117,19 @@ function executarCalculoCompleto() {
     const RB = somaMomentosA / L;
     const RA = somaForcas - RB;
 
+    // Calcula o Momento Fletor Máximo (Mmax) com precisão para múltiplas cargas
     let Mmax = 0;
-    cargasP.forEach(carga => {
-        const M_local = RA * carga.a;
+    cargasP.forEach(pontoAnalise => {
+        let x = pontoAnalise.a; // Ponto de teste
+        let M_local = RA * x;   // Momento gerado pela reação de apoio esquerda
+        
+        // Subtrai o momento provocado por qualquer carga que esteja antes deste ponto x
+        cargasP.forEach(carga => {
+            if (carga.a < x) {
+                M_local -= carga.P * (x - carga.a);
+            }
+        });
+
         if (Math.abs(M_local) > Math.abs(Mmax)) Mmax = M_local;
     });
 
