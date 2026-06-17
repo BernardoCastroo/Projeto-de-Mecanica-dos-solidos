@@ -11,7 +11,7 @@ const ctx = canvas.getContext('2d');
 const padding = 40; 
 const escala = (canvas.width - 2 * padding) / 10; 
 
-// --- CONFIGURAÇÃO DOS EVENT LISTENERS ---
+//  CONFIGURAÇÃO DOS EVENT LISTENERS 
 document.getElementById('btn-add-no').addEventListener('click', adicionarNo);
 document.getElementById('btn-add-barra').addEventListener('click', adicionarBarra);
 document.getElementById('btn-add-apoio').addEventListener('click', adicionarApoio);
@@ -20,7 +20,7 @@ document.getElementById('btn-calcular-esforcos').addEventListener('click', calcu
 document.getElementById('btn-limpar-tudo').addEventListener('click', limparTudo);
 document.getElementById('btn-fechar-alerta').addEventListener('click', fecharAlerta);
 
-// --- FUNÇÃO DE ALERTA ---
+// FUNÇÃO DE ALERTA 
 function mostrarAlerta(titulo, mensagem) {
     document.getElementById('alerta-titulo').textContent = titulo;
     document.getElementById('alerta-mensagem').textContent = mensagem;
@@ -31,7 +31,7 @@ function fecharAlerta() {
     document.getElementById('modal-alerta').style.display = 'none';
 }
 
-// --- NÓS ---
+// NÓS 
 function adicionarNo() {
     const idInput = document.getElementById('node-id');
     const xInput = document.getElementById('node-x');
@@ -82,7 +82,7 @@ function removerNo(idParaRemover) {
     desenharEstrutura();
 }
 
-// --- BARRAS ---
+//  BARRAS 
 function linhasSeCruzam(p1, p2, p3, p4) {
     const ccw = (A, B, C) => (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
     return (ccw(p1, p3, p4) !== ccw(p2, p3, p4)) && (ccw(p1, p2, p3) !== ccw(p1, p2, p4));
@@ -137,7 +137,7 @@ function removerBarra(i) {
     barras.splice(i, 1); resultadosBarras = []; atualizarListaBarras(); desenharEstrutura();
 }
 
-// --- APOIOS ---
+// APOIOS 
 function adicionarApoio() {
     const nodeInput = document.getElementById('apoio-node'); const tipoInput = document.getElementById('apoio-tipo');
     const id = nodeInput.value.toUpperCase().trim(); const tipo = tipoInput.value;
@@ -170,7 +170,7 @@ function removerApoio(id) {
     delete apoios[id]; resultadosReacoes = []; atualizarListaApoios(); desenharEstrutura();
 }
 
-// --- FORÇAS ---
+//  FORÇAS 
 function adicionarForca() {
     const nodeInput = document.getElementById('forca-node'); const modInput = document.getElementById('forca-mod');
     const angInput = document.getElementById('forca-ang'); const sentidoInput = document.getElementById('forca-sentido');
@@ -183,8 +183,6 @@ function adicionarForca() {
     if (!nos[id]) return mostrarAlerta("Atenção", `O nó "${id}" não existe!`);
 
 const rad = ang * Math.PI / 180;
-    
-    // O sinal inverte se a força estiver a empurrar (entrando no nó)
     const sinal = sentido === 'entrando' ? -1 : 1; 
     
     const fx = sinal * mod * Math.cos(rad); 
@@ -220,7 +218,7 @@ function limparTudo() {
     atualizarListaNos(); atualizarListaBarras(); atualizarListaApoios(); atualizarListaForcas(); desenharEstrutura();
 }
 
-// --- MODELO MATEMÁTICO ---
+// MODELO MATEMÁTICO 
 function resolverMatriz(A, b) {
     let n = A.length; let M = [];
     for (let i = 0; i < n; i++) M.push([...A[i], b[i]]);
@@ -332,7 +330,7 @@ function calcularEsforcos() {
     lousa.style.display = 'block'; 
 }
 
-// --- GRÁFICO 2D ---
+// GRÁFICO 2D
 const toPx = (xReal, yReal) => { return { x: padding + (xReal * escala), y: canvas.height - padding - (yReal * escala) }; };
 
 function desenharEstrutura() {

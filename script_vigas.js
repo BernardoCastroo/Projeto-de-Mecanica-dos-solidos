@@ -7,7 +7,7 @@ const ctx = canvas.getContext('2d');
 const paddingH = 50; 
 const paddingV = 60; 
 
-// --- CONFIGURAÇÃO DOS EVENT LISTENERS ---
+// CONFIGURAÇÃO DOS EVENT LISTENERS 
 document.getElementById('viga-L').addEventListener('input', desenharViga);
 document.getElementById('btn-calc-geometria').addEventListener('click', calcularGeometria);
 document.getElementById('btn-add-pontual').addEventListener('click', adicionarCargaP);
@@ -16,7 +16,7 @@ document.getElementById('btn-calc-esforcos').addEventListener('click', executarC
 document.getElementById('btn-limpar-viga').addEventListener('click', limparViga);
 
 
-// --- FUNÇÕES DE LÓGICA E INTERFACE ---
+// FUNÇÕES DE LÓGICA E INTERFACE 
 function calcularGeometria() {
     const b = parseFloat(document.getElementById('sect-b').value);
     const h = parseFloat(document.getElementById('sect-h').value);
@@ -126,7 +126,7 @@ function limparViga() {
     desenharViga();
 }
 
-// --- FÍSICA E MATEMÁTICA ---
+//  FÍSICA E MATEMÁTICA 
 function executarCalculoCompleto() {
     const L = parseFloat(document.getElementById('viga-L').value);
     
@@ -193,7 +193,7 @@ function executarCalculoCompleto() {
     `;
 }
 
-// --- MOTOR GRÁFICO 2D ---
+// GRÁFICO 2D 
 function desenharViga() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -211,11 +211,11 @@ function desenharViga() {
 
     const toPxX = (xReal) => paddingH + xReal * scaleX;
 
-    // A. Corpo da Viga
+    // Corpo da Viga
     ctx.fillStyle = '#111'; 
     ctx.fillRect(paddingH, yViga - 6, vigaWidthPx, 12);
 
-    // B. Régua Numérica
+    // Régua Numérica
     ctx.strokeStyle = '#888'; ctx.fillStyle = '#555'; ctx.font = '11px Arial'; ctx.textAlign = 'center'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(paddingH, yViga + 35); ctx.lineTo(canvas.width - paddingH, yViga + 35); ctx.stroke();
 
@@ -225,7 +225,7 @@ function desenharViga() {
         ctx.fillText(`${i}m`, marcaPx, yViga + 52);
     }
 
-    // C. Apoios
+    // Apoios
     ctx.strokeStyle = '#000'; ctx.fillStyle = '#fff'; ctx.lineWidth = 2;
     const pxA = toPxX(0);
     ctx.beginPath(); ctx.moveTo(pxA, yViga + 6); ctx.lineTo(pxA - 12, yViga + 22); ctx.lineTo(pxA + 12, yViga + 22); ctx.closePath(); ctx.fill(); ctx.stroke();
@@ -235,7 +235,7 @@ function desenharViga() {
     ctx.beginPath(); ctx.arc(pxB - 5, yViga + 24, 3, 0, 2 * Math.PI); ctx.stroke();
     ctx.beginPath(); ctx.arc(pxB + 5, yViga + 24, 3, 0, 2 * Math.PI); ctx.stroke();
 
-    // D. Cargas Distribuídas
+    // Cargas Distribuídas
     ctx.fillStyle = 'rgba(13, 110, 253, 0.2)'; 
     ctx.strokeStyle = '#0d6efd';
     ctx.lineWidth = 1.5;
@@ -272,7 +272,7 @@ function desenharViga() {
         ctx.fillStyle = 'rgba(13, 110, 253, 0.2)'; 
     });
 
-    // E. Cargas Concentradas
+    // Cargas Concentradas
     const baseArrowHeight = 35; const stepHeight = 20; const alturasOcupadas = []; 
     const cargasCalculadas = cargasP.map(carga => {
         const cxPx = toPxX(carga.a);
@@ -318,7 +318,6 @@ function desenharViga() {
     });
 }
 
-// Inicia ao carregar a página
 window.onload = function() {
     desenharViga();
 };

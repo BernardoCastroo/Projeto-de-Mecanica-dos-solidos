@@ -34,16 +34,17 @@
                     <h2>2. Seção Transversal (Retangular)</h2>
                     <div class="input-group">
                         <div class="input-field">
-                            <label>Base b (mm)</labegit add .l>
+                            <label>Base b (mm)</label>
                             <input type="number" id="sect-b" placeholder="100" value="100" oninput="propSessao = null; document.getElementById('result-geometria').innerHTML = '<span style=\'color:#d9534f; font-size: 0.85rem;\'>⚠️ Perfil alterado! Clique em Definir Perfil.</span>';">
                         </div>
                         <div class="input-field">
                             <label>Altura h (mm)</label>
                             <input type="number" id="sect-h" placeholder="200" value="200" oninput="propSessao = null; document.getElementById('result-geometria').innerHTML = '<span style=\'color:#d9534f; font-size: 0.85rem;\'>⚠️ Perfil alterado! Clique em Definir Perfil.</span>';">
                         </div>
+                        <button class="btn-add" id="btn-calc-geometria">Definir Perfil</button>
                     </div>
                     <div id="result-geometria"></div>
-                </section>
+                </section>  
 
                 <section class="step-section">
                     <h2>3. Lançamento de Cargas</h2>
