@@ -24,65 +24,89 @@
                     <div class="input-group">
                         <div class="input-field">
                             <label>Comprimento L (m)</label>
-                            <input type="number" id="viga-L" step="0.5" value="4.0" oninput="desenharViga()">
+                            <input type="number" id="viga-L" step="0.5" value="4.0">
                         </div>
                     </div>
-                    <p style="font-size:0.8rem; margin-top:0.5rem; color:#666;">Apoios padrão: Pino em x = 0 e Rolete em x = L (Biapoiada).</p>
+                    <p class="legenda-viga">Apoios padrão: Pino em x = 0 e Rolete em x = L (Biapoiada).</p>
                 </section>
 
                 <section class="step-section">
                     <h2>2. Seção Transversal (Retangular)</h2>
                     <div class="input-group">
                         <div class="input-field">
-                            <label>Base b (mm)</label>
-                            <input type="number" id="sect-b" placeholder="100" value="100">
+                            <label>Base b (mm)</labegit add .l>
+                            <input type="number" id="sect-b" placeholder="100" value="100" oninput="propSessao = null; document.getElementById('result-geometria').innerHTML = '<span style=\'color:#d9534f; font-size: 0.85rem;\'>⚠️ Perfil alterado! Clique em Definir Perfil.</span>';">
                         </div>
                         <div class="input-field">
                             <label>Altura h (mm)</label>
-                            <input type="number" id="sect-h" placeholder="200" value="200">
+                            <input type="number" id="sect-h" placeholder="200" value="200" oninput="propSessao = null; document.getElementById('result-geometria').innerHTML = '<span style=\'color:#d9534f; font-size: 0.85rem;\'>⚠️ Perfil alterado! Clique em Definir Perfil.</span>';">
                         </div>
-                        <button class="btn-add" onclick="calcularGeometria()">Definir Perfil</button>
                     </div>
                     <div id="result-geometria"></div>
                 </section>
 
                 <section class="step-section">
-                    <h2>3. Carga Concentrada</h2>
-                    <div class="input-group">
-                        <div class="input-field">
-                            <label>Força P (kN)</label>
-                            <input type="number" id="load-P" placeholder="10" value="10">
+                    <h2>3. Lançamento de Cargas</h2>
+                    <p class="info-text">Adicione forças pontuais (kN) ou distribuídas (kN/m).</p>
+
+                    <div class="panel-carga-pontual">
+                        <strong class="title-pontual">Força Concentrada</strong>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label>Força P (kN)</label>
+                                <input type="number" id="load-P" placeholder="10">
+                            </div>
+                            <div class="input-field">
+                                <label>Posição x (m)</label>
+                                <input type="number" id="load-a" placeholder="2">
+                            </div>
+                            <button class="btn-add" id="btn-add-pontual">+ Pontual</button>
                         </div>
-                        <div class="input-field">
-                            <label>Posição x (m)</label>
-                            <input type="number" id="load-a" placeholder="2" value="2">
+                    </div>
+
+                    <div class="panel-carga-distribuida">
+                        <strong class="title-distribuida">Carga Distribuída (Retangular)</strong>
+                        <div class="input-group">
+                            <div class="input-field">
+                                <label>Valor q (kN/m)</label>
+                                <input type="number" id="load-q" placeholder="5">
+                            </div>
+                            <div class="input-field">
+                                <label>Início (m)</label>
+                                <input type="number" id="load-q-start" placeholder="0">
+                            </div>
+                            <div class="input-field">
+                                <label>Fim (m)</label>
+                                <input type="number" id="load-q-end" placeholder="4">
+                            </div>
+                            <button class="btn-add btn-blue" id="btn-add-distribuida">+ Distribuída</button>
                         </div>
-                        <button class="btn-add" onclick="adicionarCargaP()">+ Adicionar Carga</button>
                     </div>
                 </section>
 
-            <section class="step-section">
-                <h2>4. Dimensionamento (Formulações)</h2>
-                <p>Teorema Fundamental do Cálculo:</p>
+                <section class="step-section">
+                    <h2>4. Dimensionamento (Formulações)</h2>
+                    <p>Teorema Fundamental do Cálculo:</p>
 
-                <div id="formula-hibbeler" style="text-align: center; margin: 1.5rem 0; font-size: 1.4rem; background:#f9f9f9; padding:1rem; border-radius:4px; color: #111;">
-                    $$ \int_{a}^{b} f(x) \,dx = F(b) - F(a) $$
-                </div>
-    
-                <button class="btn-calcular" onclick="executarCalculoCompleto()">Calcular Esforços Estruturais</button>
-                <div id="result-calculo-final"></div>
-            </section>
+                    <div id="formula-hibbeler" class="formula-box">
+                        $$ \sigma_{max} = \frac{M_{max} \cdot c}{I_z} $$
+                    </div>
+        
+                    <button class="btn-calcular" id="btn-calc-esforcos">Calcular Esforços Estruturais</button>
+                    <div id="result-calculo-final"></div>
+                </section>
+            </div>
 
             <div class="graph-panel">
                 <h3>Modelo Estático da Viga</h3>
-                <p style="font-size:0.8rem; color:#666; margin-bottom: 0.5rem;">Diagrama de cargas ativas e dimensões.</p>
+                <p class="legenda-cotas">Diagrama de cargas ativas e dimensões.</p>
                 <canvas id="canvasViga" width="500" height="250"></canvas>
                 
-                <div class="data-list" style="margin-top:1rem;">
+                <div class="data-list-vigas">
                     <strong>Lista de Cargas Aplicadas:</strong>
                     <ul id="ul-cargas-viga"></ul>
                 </div>
-                <button style="margin-top:0.5rem; background:#f4f4f4; color:#333; width:100%; border: 1px solid #ccc; padding: 0.4rem; cursor: pointer;" onclick="limparViga()">Limpar Cargas</button>
+                <button class="btn-limpar" id="btn-limpar-viga">Limpar Todas as Cargas</button>
             </div>
         </div>
     </main>
